@@ -18,12 +18,13 @@
 #	@abcdehl 	whatever it actually is.
 #	@pc 		current program counter value
 #	@carry 		carry flag
-#	@pszv 		value used for checking psz
+#	@psz 		value used for checking psz
 #	@n 			condition name (nc,nz,p,po,c,z,m,pe) from bits 3,4,5
 #	@t 			code that tests above condition
 #	@rst 		restart address as 2 digit hex
 #	@port 		port address as 2 digit hex.
 #
+#	@cycles(n)	advance n cycles
 #	@fetch8() 	fetch byte into MB
 #	@fetch16()	fetch word into MA
 #	@read()		read MA -> MB
@@ -258,12 +259,12 @@ B7 				8 		"ora m"
 
 40..78,8 		10 		"j@n $2"
 	1:[*,0,@pc,mb]		@fetch16()
-	2:[*,0,@pc-1,ma & 0xFF]	if (@t) { @goto(); }
+	2:[*,0,@pc-1,ma & 0xFF]	if (@test) { @goto(); }
 	3:[0,0,@pc,ma >> 8]	;
 
 42..7A,8 		10 		"c@n $2"
 	1:[*,0,@pc,mb]		@fetch16()
-	2:[*,0,@pc-1,ma & 0xFF]	if (@t) { @push();@goto(); }
+	2:[*,0,@pc-1,ma & 0xFF]	if (@test) { @push();@goto(); }
 	3:[0,0,@pc,ma >> 8]	;
 
 # ****************************************************************************************************
@@ -278,7 +279,7 @@ B7 				8 		"ora m"
 # ****************************************************************************************************
 
 03..3B,8 		4 		"r@n"
-	1:[0,0,@pc,mb]		if (@t) { @pull(); }
+	1:[0,0,@pc,mb]		if (@test) { @pull(); }
 
 # ****************************************************************************************************
 #										    Restart Instruction
