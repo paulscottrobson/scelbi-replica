@@ -4,7 +4,8 @@
 #										8008 Cycle Emulation
 #										====================
 #
-#	Ref: 	Scelbi 8-H User's Manual (Nat Wadsworth)
+#	Ref: 	8008 User Manual
+#			Scelbi 8-H User's Manual (Nat Wadsworth)
 #			8008 Datasheet
 #
 #
@@ -17,15 +18,15 @@
 #	@addr  	rst addr in hex 2 digits
 #	@port 	port addr in hex 2 digits
 #	@mahl 	copy hl to ma.
-#	@goto 	pc := temp16 & 0x3FFF
 #	@test 	conditional test (on bits 3,4,5)
 #	@tname	conditional test name (on bits 3,4,5)
-#	@push 	push pc on stack
-#	@pull	pull pc off stack
 #
+#	goto() 	pc := temp16 & 0x3FFF
 #	fetch()	pc -> ma ; read() ; pc++ / or read from keys in interrupt mode (?)
 #	read()	read memory
 #	write()	write memory
+#	push() 	push pc on stack
+#	pull()	pull pc off stack
 #
 # ****************************************************************************************************
 #									Index Register Instructions
@@ -198,31 +199,31 @@ BF 			8 		"cmp m"
 44-7C,8 	11 		"jmp $2"
 	1:		
 	2:		fetch(); temp16 = mb
-	3:		fetch(); temp16 = (mb << 8) | temp16 ; @goto
+	3:		fetch(); temp16 = (mb << 8) | temp16 ; goto()
 
 40-78,8 	10		"j@tname $2"
 	1:		
 	2:		fetch(); temp16 = mb
-	3:		fetch(); temp16 = (mb << 8) | temp16 ; if (@test) { @goto; }
+	3:		fetch(); temp16 = (mb << 8) | temp16 ; if (@test) { goto(); }
 
 46-7E,8 	11 		"call $2"
 	1:		
 	2:		fetch(); temp16 = mb
-	3:		fetch(); temp16 = (mb << 8) | temp16 ; @push; @goto
+	3:		fetch(); temp16 = (mb << 8) | temp16 ; push(); goto()
 
 42-7A,8 	10		"c@tname $2"
 	1:		
 	2:		fetch(); temp16 = mb
-	3:		fetch(); temp16 = (mb << 8) | temp16 ; if (@test) { @push; @goto; }
+	3:		fetch(); temp16 = (mb << 8) | temp16 ; if (@test) { push(); goto(); }
 
 07-3F,8 	5 		"ret"
-	1:		@pull
+	1:		pull()
 
 03-3B,8 	4 		"r@tname"
-	1:		if (@test) { @pull; }
+	1:		if (@test) { pull(); }
 
 05-3D,8 	5 		"rst @addr"	
-	1:		temp16 = 0x@addr ; @push ; @goto
+	1:		temp16 = 0x@addr ; push() ; goto()
 
 # ****************************************************************************************************
 #											I/O Instructions
@@ -245,3 +246,4 @@ BF 			8 		"cmp m"
 
 FF 			4 		"hlt"
 	1: 		halt = 1
+
